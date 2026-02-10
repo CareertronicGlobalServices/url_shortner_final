@@ -18,12 +18,16 @@ async function handleUserLogin(req, res) {
   const user = await USER.findOne({ email, password });
   console.log(user);
   if (!user) return res.render("Login", { error: Invalid });
-  const sessionId = uuidv4();
-  console.log(sessionId);
-  setUser(sessionId, user);
-  res.cookie("uid", sessionId, {
+  //const sessionId = uuidv4();
+  //console.log(sessionId);
+  //setUser(sessionId, user);
+
+  const token = setUser(user);
+  console.log(token);
+  res.cookie("uid", token, {
     httpOnly: true,
     path: "/",
+    maxAge: 20 * 1000,
   });
   console.log("Cookies:", req.cookies);
 
@@ -31,11 +35,11 @@ async function handleUserLogin(req, res) {
 }
 
 function handleUserLogout(req, res) {
-  const sessionId = req.cookies?.uid;
+  //const sessionId = req.cookies?.uid;
 
-  if (sessionId) {
-    deleteUser(sessionId); // remove session
-  }
+  // if (sessionId) {
+  //   deleteUser(sessionId); // remove session
+  // }
 
   res.clearCookie("uid"); // remove cookie
   return res.render("LoggedOff");
